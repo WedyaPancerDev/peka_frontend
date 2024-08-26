@@ -1,7 +1,15 @@
-import { Box, Avatar, Typography, useMediaQuery } from "@mui/material";
+import {
+  Box,
+  Avatar,
+  Typography,
+  useMediaQuery,
+  Skeleton,
+} from "@mui/material";
+
 import { type AppState, useSelector } from "store/Store";
 
 export const Profile = (): JSX.Element => {
+  const { profile } = useSelector((state: AppState) => state.dashboard);
   const customizer = useSelector((state: AppState) => state.customizer);
 
   const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up("lg"));
@@ -23,22 +31,35 @@ export const Profile = (): JSX.Element => {
             src={"/assets/images/avatar/default-avatar.svg"}
           />
 
-          <Box>
-            <Typography
-              variant="h6"
-              sx={{
-                width: "80px",
-                marginTop: "2px",
-                overflow: "hidden",
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-              }}
-            >
-              Jack Pitter
-            </Typography>
-            <Typography variant="caption" sx={{ textTransform: "capitalize" }}>
-              Admin
-            </Typography>
+          <Box component="div" className="profile-container">
+            {!profile ? (
+              <>
+                <Skeleton sx={{ height: "30px", width: "100px" }} />
+                <Skeleton sx={{ height: "20px", width: "50px" }} />
+              </>
+            ) : (
+              <>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    width: "80px",
+                    marginY: "2px",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {profile?.user?.fullname ?? "No Name"}
+                </Typography>
+
+                <Typography
+                  variant="caption"
+                  sx={{ textTransform: "uppercase" }}
+                >
+                  {profile?.user?.role ?? "💀"}
+                </Typography>
+              </>
+            )}
           </Box>
         </>
       ) : (

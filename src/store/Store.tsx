@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import CustomizerReducer from "./customizer/CustomizerSlice";
+import DashboardReducer from "./apps/DashboardSlice";
 
 import { combineReducers } from "redux";
 import {
@@ -12,11 +13,13 @@ import {
 export const store = configureStore({
   reducer: {
     customizer: CustomizerReducer,
+    dashboard: DashboardReducer,
   },
 });
 
 const rootReducer = combineReducers({
   customizer: CustomizerReducer,
+  dashboard: DashboardReducer,
 });
 
 export type AppState = ReturnType<typeof rootReducer>;

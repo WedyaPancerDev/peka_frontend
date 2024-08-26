@@ -1,13 +1,19 @@
 import nookies, { setCookie, destroyCookie } from "nookies";
 
 type ReturnTypes = {
-  saveCookie: (token: string, keyActive?: string) => void;
+  saveCookie: (args: SaveCookieProps) => void;
   getCurrentCookie: (keyActive?: string) => string | null;
   removeFromCookie: () => void;
 
   saveToLocalStorage: (key: string, value: string) => void;
   getFromLocalStorage: (key: string) => string | null;
   removeFromLocalStorage: (key: string) => void;
+};
+
+type SaveCookieProps = {
+  token: string;
+  keyActive?: string;
+  exp?: number;
 };
 
 const key = "@access-point";
@@ -19,12 +25,16 @@ const useCookie = (): ReturnTypes => {
     return currentToken[keyActive] || null;
   };
 
-  const saveCookie = (token: string, keyActive: string = key): void => {
+  const saveCookie = ({
+    token,
+    keyActive = key,
+    exp,
+  }: SaveCookieProps): void => {
     const currentToken = getCurrentCookie();
 
     if (!currentToken) {
       setCookie(null, keyActive, String(token), {
-        maxAge: 1 * 60 * 60 * 24,
+        maxAge: exp || 1 * 60 * 60 * 24,
         path: "/",
       });
     }

@@ -6,6 +6,8 @@ import {
   Divider,
   IconButton,
 } from "@mui/material";
+import { AxiosError } from "axios";
+import toast from "react-hot-toast";
 import { Fragment, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
@@ -17,24 +19,32 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import CustomFormLabel from "components/FormLabel";
 import CustomTextField from "components/OutlineInput";
 
+import useCookie from "hooks/useCookie";
+import { setTokenBearer } from "utils/axios";
+import { type LoginPayload, authLogin } from "services/auth";
+import { ApiResponse, ErrorPayload } from "types/response";
+
 const formSchema = yup.object().shape({
   email: yup.string().email("Email tidak valid").required("Email wajib diisi"),
   password: yup.string().required("Password wajib diisi"),
 });
 
 const AuthLogin = (): JSX.Element => {
+  const { saveCookie } = useCookie();
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const { handleSubmit, watch, control, setValue } = useForm({
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-    resolver: yupResolver(formSchema),
-  });
+  const { handleSubmit, watch, control, setValue, getValues, setError } =
+    useForm({
+      defaultValues: {
+        email: "",
+        password: "",
+      },
+
+      resolver: yupResolver(formSchema),
+    });
 
   const form = watch();
 
@@ -43,27 +53,68 @@ const AuthLogin = (): JSX.Element => {
     setValue("password", "");
   };
 
-  // const getPayload = (): AuthLoginProps => {
-  //   const values = getValues();
+  const getPayload = (): LoginPayload => {
+    const values = getValues();
 
-  //   return {
-  //     email: values.email,
-  //     password: values.password,
-  //   };
-  // };
+    return {
+      email: values.email,
+      password: values.password,
+    };
+  };
 
   const onSubmit = async (): Promise<void> => {
-    // const payload = getPayload();
+    const payload = getPayload();
 
     try {
       setIsSubmitting(true);
 
-      clearForm();
-      navigate("/dashboard");
+      const result = await authLogin(payload);
 
+      if (result?.success) {
+        const data = result?.data;
+
+        setTokenBearer(data?.token);
+        saveCookie({
+          token: data?.token,
+          exp: data?.exp,
+        });
+
+        clearForm();
+        toast.success("Hi! Selamat datang di sistem 😉");
+        navigate("/dashboard");
+
+        setIsSubmitting(false);
+        return;
+      }
+
+      toast.error(result.message);
       setIsSubmitting(false);
     } catch (error) {
       setIsSubmitting(false);
+
+      const newError = (error as AxiosError).response
+        ?.data as ApiResponse<ErrorPayload>;
+
+      if (!newError?.success && Array.isArray(newError?.data?.errors)) {
+        const errors = newError?.data.errors;
+
+        errors.forEach((err) => {
+          setError(err.field as "email" | "password", {
+            type: "manual",
+            message: err.messages,
+          });
+        });
+      } else {
+        setError("password", {
+          type: "manual",
+          message: newError.message,
+        });
+      }
+
+      toast.error(
+        newError.message ??
+          "Oops! Terjadi kesalahan saat melakukan login. Silahkan coba lagi!"
+      );
     }
   };
 
@@ -127,7 +178,7 @@ const AuthLogin = (): JSX.Element => {
                       const value = e.target.value;
                       field.onChange(value.toLowerCase());
                     }}
-                    sx={{ fontWeight: 600 }}
+                    sx={{ fontWeight: 600, marginBottom: "4px" }}
                     autoComplete="email"
                     disabled={isSubmitting}
                     placeholder="Contoh: sintya@pekka.com"
@@ -139,6 +190,7 @@ const AuthLogin = (): JSX.Element => {
                       fontSize="12px"
                       fontWeight={600}
                       color="red"
+                      paddingTop="10px"
                     >
                       {error.message}
                     </Typography>
@@ -162,7 +214,7 @@ const AuthLogin = (): JSX.Element => {
                     {...field}
                     fullWidth
                     autoComplete="new-password"
-                    sx={{ fontWeight: 600 }}
+                    sx={{ fontWeight: 600, marginBottom: "4px" }}
                     endAdornment={
                       <IconButton
                         onClick={() => {

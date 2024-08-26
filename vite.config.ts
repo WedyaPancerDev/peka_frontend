@@ -15,7 +15,7 @@ export default defineConfig({
       routes: "/src/routes",
       services: "/src/services",
       layouts: "/src/layouts",
-      util: "/src/utils",
+      utils: "/src/utils",
       type: "/src/types",
       store: "/src/store",
       theme: "/src/theme",
@@ -39,6 +39,17 @@ export default defineConfig({
           },
         },
       ],
+    },
+  },
+  server: {
+    port: 5180,
+    proxy: {
+      "/api/v1": {
+        target: "http://localhost:5000/api/v1",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/v1/, ""),
+      },
     },
   },
 

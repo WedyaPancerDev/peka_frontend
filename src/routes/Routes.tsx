@@ -9,10 +9,17 @@ const Dashboard = lazy(() => import("pages/dashboard"));
 
 import NotFound from "pages/404";
 
+import PublicRoute from "./middlewares/PublicRoute";
+import AuthenticatedRoute from "./middlewares/AuthenticatedRoute";
+
 export const routers = createBrowserRouter([
   {
     path: "/",
-    element: <FullLayout />,
+    element: (
+      <AuthenticatedRoute>
+        <FullLayout />
+      </AuthenticatedRoute>
+    ),
     children: [
       { path: "/", element: <Navigate to="/dashboard" replace /> },
       { path: "/dashboard", element: <Dashboard /> },
@@ -21,7 +28,11 @@ export const routers = createBrowserRouter([
   },
   {
     path: "/",
-    element: <BlankLayout />,
+    element: (
+      <PublicRoute>
+        <BlankLayout />
+      </PublicRoute>
+    ),
     children: [{ path: "masuk", element: <Login /> }],
     errorElement: <NotFound />,
   },

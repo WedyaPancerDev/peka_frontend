@@ -1,6 +1,6 @@
 import { useMediaQuery, Box, Drawer, useTheme } from "@mui/material";
 import SidebarItems from "./SidebarItems";
-import Logo from "components/Logo";
+// import Logo from "components/Logo";
 import { useSelector, useDispatch, type AppState } from "store/Store";
 import {
   hoverSidebar,
@@ -124,7 +124,16 @@ const Sidebar = (): JSX.Element => {
       {/* Logo */}
       {/* ------------------------------------------- */}
       <Box p={2}>
-        <Logo />
+        <img
+          src={"/assets/images/backgrounds/pekka.png"}
+          alt="bg"
+          style={{
+            width: "100%",
+            maxWidth: "70px",
+            objectFit: "cover",
+          }}
+          loading="lazy"
+        />
       </Box>
       {/* ------------------------------------------- */}
       {/* Sidebar For Mobile */}
