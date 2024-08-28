@@ -6,7 +6,6 @@ import { ThemeSettings } from "theme/Theme";
 import { routers } from "routes/Routes";
 
 function App() {
-  // const routing = useRoutes(routes);
   const theme = ThemeSettings();
 
   return (

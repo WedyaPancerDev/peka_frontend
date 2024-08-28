@@ -4,6 +4,8 @@ import { useNavigate } from "react-router";
 
 import { authLogout } from "services/auth";
 import useCookie from "hooks/useCookie";
+import { AxiosError } from "axios";
+import { ERROR_CODE_UNAUTHENTICATED } from "utils/http";
 
 interface ILogoutHookReturn {
   handleLogout: () => Promise<void>;
@@ -36,9 +38,21 @@ const useLogout = (): ILogoutHookReturn => {
       toast.error("Gagal logout, silahkan coba lagi!");
       setIsLoadingLogout(false);
     } catch (error) {
-      setIsLoadingLogout(false);
-      toast.error("Gagal logout, silahkan coba lagi!");
+      const status = (error as AxiosError)?.response?.status;
       console.error({ error });
+
+      setIsLoadingLogout(false);
+      if (status === ERROR_CODE_UNAUTHENTICATED) {
+        removeFromCookie();
+        navigate("/masuk", {
+          replace: true,
+        });
+
+        window.location.reload();
+        toast.error("Sesi Anda telah berakhir, silahkan login kembali");
+      } else {
+        toast.error("Gagal logout, silahkan coba lagi!");
+      }
     }
   };
 

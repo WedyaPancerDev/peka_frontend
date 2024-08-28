@@ -6,6 +6,8 @@ import { AppState, useDispatch, useSelector } from "store/Store";
 import PageLoader from "components/PageLoader";
 import { useProfileUser } from "hooks/react-query/useAuth";
 import { setProfile } from "store/apps/DashboardSlice";
+import { AxiosError } from "axios";
+import toast from "react-hot-toast";
 
 type AuthenticatedRouteProps = {
   children: React.ReactNode;
@@ -14,35 +16,45 @@ type AuthenticatedRouteProps = {
 const AuthenticatedRoute = ({
   children,
 }: AuthenticatedRouteProps): JSX.Element => {
-  const { getCurrentCookie } = useCookie();
-  const { data: profileUserData, isLoading: isLoadingProfile } =
-    useProfileUser();
-
+  const { getCurrentCookie, removeFromCookie } = useCookie();
+  const {
+    data: profileUserData,
+    isLoading: isLoadingProfile,
+    error,
+  } = useProfileUser();
   const { profile } = useSelector((state: AppState) => state.dashboard);
   const dispatch = useDispatch();
-
-  const token = getCurrentCookie();
   const navigate = useNavigate();
 
+  const token = getCurrentCookie();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!token) {
-      navigate("/masuk", {
-        replace: true,
-      });
-
+      navigate("/masuk", { replace: true });
+      removeFromCookie();
       setIsAuthenticated(false);
     } else {
       setIsAuthenticated(true);
     }
-  }, [token, navigate]);
+  }, [token, navigate, removeFromCookie]);
 
   useEffect(() => {
     if (token && !profile && profileUserData?.data) {
-      dispatch(setProfile(profileUserData?.data));
+      dispatch(setProfile(profileUserData.data));
     }
-  }, [token, profile, profileUserData?.data]);
+  }, [token, profile, profileUserData, dispatch]);
+
+  useEffect(() => {
+    const status = (error as AxiosError)?.response?.status;
+
+    if (error && status === 401) {
+      navigate("/masuk", { replace: true });
+
+      removeFromCookie();
+      toast.error("Sesi Anda telah berakhir, silahkan login kembali");
+    }
+  }, [error, navigate, removeFromCookie]);
 
   if (!isAuthenticated || isLoadingProfile) {
     return <PageLoader />;
