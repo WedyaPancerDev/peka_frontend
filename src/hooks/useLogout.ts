@@ -6,6 +6,7 @@ import { authLogout } from "services/auth";
 import useCookie from "hooks/useCookie";
 import { AxiosError } from "axios";
 import { ERROR_CODE_UNAUTHENTICATED } from "utils/http";
+import { setTokenBearer } from "utils/axios";
 
 interface ILogoutHookReturn {
   handleLogout: () => Promise<void>;
@@ -25,6 +26,7 @@ const useLogout = (): ILogoutHookReturn => {
 
       if (response?.success) {
         removeFromCookie();
+        setTokenBearer("");
         navigate("/masuk", {
           replace: true,
         });

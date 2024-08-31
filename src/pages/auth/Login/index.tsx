@@ -5,7 +5,7 @@ import AuthLogin from "./module/AuthLoginModule";
 
 const Login = (): JSX.Element => {
   return (
-    <PageContainer title="PEKKA - Masuk" description="">
+    <PageContainer title="Masuk - Yayasan Pemberdayaan Perempuan Kepala Keluarga PEKKA" description="">
       <Grid
         container
         spacing={0}

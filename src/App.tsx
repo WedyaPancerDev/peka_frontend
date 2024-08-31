@@ -3,7 +3,7 @@ import { RouterProvider } from "react-router-dom";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 
 import { ThemeSettings } from "theme/Theme";
-import { routers } from "routes/Routes";
+import routers from "routes/Routes";
 
 function App() {
   const theme = ThemeSettings();

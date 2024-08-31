@@ -28,7 +28,7 @@ export const Profile = (): JSX.Element => {
         <>
           <Avatar
             alt="Default Avatar"
-            src={"/assets/images/avatar/default-avatar.svg"}
+            src={profile?.avatar ?? "/assets/images/avatar/default-avatar.svg"}
           />
 
           <Box component="div" className="profile-container">
@@ -49,14 +49,14 @@ export const Profile = (): JSX.Element => {
                     textOverflow: "ellipsis",
                   }}
                 >
-                  {profile?.user?.fullname ?? "No Name"}
+                  {profile?.fullname ?? "No Name"}
                 </Typography>
 
                 <Typography
                   variant="caption"
                   sx={{ textTransform: "uppercase" }}
                 >
-                  {profile?.user?.role ?? "💀"}
+                  {profile?.role ?? "💀"}
                 </Typography>
               </>
             )}

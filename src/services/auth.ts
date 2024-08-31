@@ -6,13 +6,13 @@ export type LoginResponse = {
   token: string;
   token_type: string;
   role: Role;
-  email: string;
+  phone: string;
   user_id: string;
   exp: number;
 };
 
 export type LoginPayload = {
-  email: string;
+  phone: string;
   password: string;
 };
 
@@ -77,22 +77,20 @@ export const authUpdateProfile = async (
 };
 
 export type UserProfileResponse = {
-  user: {
-    id: string;
-    fullname: string;
-    email: string;
-    avatar: string | null;
-    gender: "male" | "female";
-    phone: string;
-    role: Role;
-    account_status: "active" | "inactive";
-  };
+  id: string;
+  fullname: string;
+  email: string;
+  avatar: string | null;
+  gender: "male" | "female";
+  phone: string;
+  role: Role;
+  account_status: "active" | "inactive";
 };
 
 export const getUserProfile = async (): Promise<
   ApiResponse<UserProfileResponse>
 > => {
-  const result = await axios.get("/user/profile");
+  const result = await axios.get("/auth/me");
 
   return result.data as ApiResponse<UserProfileResponse>;
 };

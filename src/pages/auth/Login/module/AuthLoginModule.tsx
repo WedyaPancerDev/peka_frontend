@@ -25,7 +25,15 @@ import { type LoginPayload, authLogin } from "services/auth";
 import { ApiResponse, ErrorPayload } from "types/response";
 
 const formSchema = yup.object().shape({
-  email: yup.string().email("Email tidak valid").required("Email wajib diisi"),
+  phone: yup
+    .string()
+    .required("No telepon harus diisi")
+    .matches(
+      /^0\d{9,14}$/,
+      "Format nomor telepon harus dimulai dengan 0 dan memiliki panjang antara 10 hingga 15 karakter"
+    )
+    .min(10, "Minimal 10 karakter")
+    .max(15, "Maksimal 15 karakter"),
   password: yup.string().required("Password wajib diisi"),
 });
 
@@ -39,7 +47,7 @@ const AuthLogin = (): JSX.Element => {
   const { handleSubmit, watch, control, setValue, getValues, setError } =
     useForm({
       defaultValues: {
-        email: "",
+        phone: "",
         password: "",
       },
 
@@ -49,7 +57,7 @@ const AuthLogin = (): JSX.Element => {
   const form = watch();
 
   const clearForm = (): void => {
-    setValue("email", "");
+    setValue("phone", "");
     setValue("password", "");
   };
 
@@ -57,7 +65,7 @@ const AuthLogin = (): JSX.Element => {
     const values = getValues();
 
     return {
-      email: values.email,
+      phone: values.phone,
       password: values.password,
     };
   };
@@ -99,7 +107,7 @@ const AuthLogin = (): JSX.Element => {
         const errors = newError?.data.errors;
 
         errors.forEach((err) => {
-          setError(err.field as "email" | "password", {
+          setError(err.field as "phone" | "password", {
             type: "manual",
             message: err.messages,
           });
@@ -119,7 +127,7 @@ const AuthLogin = (): JSX.Element => {
   };
 
   const isDisabled =
-    form.email === "" || form.password === "" || form.password.length < 8;
+    form.phone === "" || form.password === "" || form.password.length < 8;
 
   return (
     <Fragment>
@@ -160,28 +168,30 @@ const AuthLogin = (): JSX.Element => {
       >
         <Stack>
           <Controller
-            name="email"
+            name="phone"
             control={control}
             render={({ field, fieldState: { error } }) => {
               return (
                 <Box className="form-control">
-                  <CustomFormLabel htmlFor="email">
-                    Masukan Email
+                  <CustomFormLabel htmlFor="phone">
+                    Masukan Nomor Telepon
                   </CustomFormLabel>
                   <CustomTextField
                     {...field}
                     fullWidth
-                    type="email"
-                    id="email"
+                    type="text"
+                    id="phone"
                     error={!!error}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const value = e.target.value;
-                      field.onChange(value.toLowerCase());
+                      if (!/[^0-9]/.test(value)) {
+                        field.onChange(value.replace(/[^0-9]/, ""));
+                      }
                     }}
                     sx={{ fontWeight: 600, marginBottom: "4px" }}
-                    autoComplete="email"
+                    autoComplete="phone"
                     disabled={isSubmitting}
-                    placeholder="Contoh: sintya@pekka.com"
+                    placeholder="Contoh: 089777888333"
                   />
 
                   {error && (

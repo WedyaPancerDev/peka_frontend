@@ -1,23 +1,22 @@
-import { lazy } from "react";
+import loadable from "@loadable/component";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
-import Event from "pages/event";
-import Module from "pages/modul";
-import Dashboard from "pages/dashboard";
-import Discussion from "pages/discussion";
-import Announcement from "pages/announcement";
+const FullLayout = loadable(() => import("layouts/full/FullLayout"));
+const BlankLayout = loadable(() => import("layouts/blank/BlankLayout"));
+
+const Login = loadable(() => import("pages/auth/Login"));
+const Event = loadable(() => import("pages/event"));
+const Module = loadable(() => import("pages/modul"));
+const Dashboard = loadable(() => import("pages/dashboard"));
+const Discussion = loadable(() => import("pages/discussion"));
+const Announcement = loadable(() => import("pages/announcement"));
 
 import NotFound from "pages/404";
-
-const Login = lazy(() => import("pages/auth/Login"));
-
-const FullLayout = lazy(() => import("layouts/full/FullLayout"));
-const BlankLayout = lazy(() => import("layouts/blank/BlankLayout"));
 
 import PublicRoute from "./middlewares/PublicRoute";
 import AuthenticatedRoute from "./middlewares/AuthenticatedRoute";
 
-export const routers = createBrowserRouter([
+const routers = createBrowserRouter([
   {
     path: "/",
     element: (
@@ -46,3 +45,5 @@ export const routers = createBrowserRouter([
     errorElement: <NotFound />,
   },
 ]);
+
+export default routers;

@@ -72,7 +72,7 @@ const Profile = (): JSX.Element => {
         <Typography variant="h5">User Profile</Typography>
         <Stack direction="row" py={3} spacing={2} alignItems="center">
           <Avatar
-            src={"/assets/images/avatar/default-avatar.svg"}
+            src={profile?.avatar ?? "/assets/images/avatar/default-avatar.svg"}
             alt="Default Avatar"
             sx={{ width: 65, height: 65 }}
           />
@@ -97,7 +97,7 @@ const Profile = (): JSX.Element => {
                     textOverflow: "ellipsis",
                   }}
                 >
-                  {profile?.user?.fullname ?? "No Name"}
+                  {profile?.fullname ?? "No Name"}
                 </Typography>
 
                 <Typography
@@ -105,7 +105,7 @@ const Profile = (): JSX.Element => {
                   color="textSecondary"
                   textTransform="uppercase"
                 >
-                  {profile?.user?.role ?? "💀"}
+                  {profile?.role ?? "💀"}
                 </Typography>
 
                 <Typography
@@ -131,7 +131,7 @@ const Profile = (): JSX.Element => {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {profile?.user?.email ?? "Tidak ada email"}
+                    {profile?.email ?? "Tidak ada email"}
                   </span>
                 </Typography>
               </>
