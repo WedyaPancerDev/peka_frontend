@@ -14,9 +14,9 @@ function App() {
       <RouterProvider router={routers} />
 
       <Toaster
-        position="top-right"
+        position="bottom-right"
         toastOptions={{
-          duration: 6000,
+          duration: 5000,
         }}
       />
     </ThemeProvider>

@@ -17,44 +17,46 @@ const AuthenticatedRoute = ({
   children,
 }: AuthenticatedRouteProps): JSX.Element => {
   const { getCurrentCookie, removeFromCookie } = useCookie();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const {
     data: profileUserData,
     isLoading: isLoadingProfile,
     error,
   } = useProfileUser();
   const { profile } = useSelector((state: AppState) => state.dashboard);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const token = getCurrentCookie();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    if (!token) {
-      navigate("/masuk", { replace: true });
-      removeFromCookie();
-      setIsAuthenticated(false);
-    } else {
-      setIsAuthenticated(true);
-    }
-  }, [token, navigate, removeFromCookie]);
+  const handleUnauthenticated = () => {
+    removeFromCookie();
+    navigate("/masuk", { replace: true });
+    setIsAuthenticated(false);
+  };
+
+  const handleSessionExpired = () => {
+    removeFromCookie();
+    navigate("/masuk", { replace: true });
+    toast.error("Sesi Anda telah berakhir, silahkan login kembali");
+  };
 
   useEffect(() => {
-    if (token && !profile && profileUserData?.data) {
-      dispatch(setProfile(profileUserData.data));
+    if (!token) {
+      handleUnauthenticated();
+    } else {
+      setIsAuthenticated(true);
+      if (!profile && profileUserData?.data) {
+        dispatch(setProfile(profileUserData.data));
+      }
     }
   }, [token, profile, profileUserData, dispatch]);
 
   useEffect(() => {
-    const status = (error as AxiosError)?.response?.status;
-
-    if (error && status === 401) {
-      navigate("/masuk", { replace: true });
-
-      removeFromCookie();
-      toast.error("Sesi Anda telah berakhir, silahkan login kembali");
+    if (error && (error as AxiosError)?.response?.status === 401) {
+      handleSessionExpired();
     }
-  }, [error, navigate, removeFromCookie]);
+  }, [error]);
 
   if (!isAuthenticated || isLoadingProfile) {
     return <PageLoader />;

@@ -45,7 +45,7 @@ const Profile = (): JSX.Element => {
         onClick={handleClick2}
       >
         <Avatar
-          src={"/assets/images/avatar/default-avatar.svg"}
+          src={profile?.avatar ?? "/assets/images/avatar/default-avatar.svg"}
           alt={"ProfileImg"}
           sx={{
             width: 35,
@@ -131,7 +131,7 @@ const Profile = (): JSX.Element => {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {profile?.email ?? "Tidak ada email"}
+                    {profile?.phone ?? "Tidak ada email"}
                   </span>
                 </Typography>
               </>

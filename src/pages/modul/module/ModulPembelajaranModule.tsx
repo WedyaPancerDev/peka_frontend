@@ -1,8 +1,22 @@
-import { Fragment } from "react";
 import moment from "moment";
-import { IconNote } from "@tabler/icons-react";
+import { Fragment } from "react";
+import {
+  IconBrandYoutube,
+  IconEyeSearch,
+  IconNote,
+  IconPencil,
+  IconTrash,
+} from "@tabler/icons-react";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
-import { Box, Button, Theme, Typography, useMediaQuery } from "@mui/material";
+import {
+  Box,
+  Button,
+  Theme,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import SkeletonLoader from "components/Loader/SkeletonLoader";
 import { useAllModule } from "hooks/react-query/useModule";
 
@@ -10,53 +24,30 @@ import "./index.css";
 
 const ModulPembelajaranModule = () => {
   const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up("lg"));
+  const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up("md"));
 
-  const {
-    data: dataModules,
-    isLoading: isLoadingModule,
-    isError,
-  } = useAllModule();
+  const { data: dataModules, isLoading: isLoadingModule } = useAllModule();
 
-  const RenderSkeleton = ({ isLarge }: { isLarge: boolean }) => (
+  const RenderSkeleton = () => (
     <Fragment>
-      {Array(3)
-        .fill(3)
-        .map((_, index, array) => {
-          const lastAndFirst = index === 0 || index === array.length - 1;
-
-          return (
-            <SkeletonLoader
-              key={index}
-              style={{
-                gridColumn:
-                  lastAndFirst && isLarge
-                    ? "span 2 / span 2"
-                    : "span 1 / span 1",
-              }}
-            />
-          );
+      {Array(4)
+        .fill(4)
+        .map((_, index) => {
+          return <SkeletonLoader key={index} />;
         })}
     </Fragment>
   );
 
   return (
-    <Box component="section" sx={{ marginY: "20px" }}>
+    <Box component="section" sx={{ marginTop: "20px", marginBottom: "40px" }}>
       <Box
         component="div"
         sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
         }}
       >
-        <Box component="div" className="left-content">
-          <Typography variant="h6" sx={{ color: "#111" }}>
-            <b>Last Updated:</b>{" "}
-            <span style={{ fontWeight: 500, color: "#6b7280" }}>
-              2021-10-10 10:00
-            </span>
-          </Typography>
-        </Box>
         <Box component="div" className="right-content">
           <Button type="button" variant="contained" color="primary">
             Tambah Modul Pembelajaran
@@ -69,16 +60,14 @@ const ModulPembelajaranModule = () => {
           gap: "12px",
           display: "grid",
           gridTemplateColumns:
-            lgUp && dataModules?.data ? "repeat(3, 1fr)" : "repeat(1, 1fr)",
+            mdUp && dataModules?.data ? "repeat(2, 1fr)" : "repeat(1, 1fr)",
           marginTop: "20px",
         }}
       >
         {isLoadingModule ? (
-          <RenderSkeleton isLarge={lgUp} />
+          <RenderSkeleton />
         ) : dataModules ? (
-          dataModules?.data.map((modul, index, array) => {
-            const lastAndFirst = index === 0 || index === array.length - 1;
-
+          dataModules?.data.map((modul) => {
             const formattedDate = moment(modul.created_at).format(
               "DD MMMM YYYY"
             );
@@ -87,76 +76,191 @@ const ModulPembelajaranModule = () => {
               <Box
                 key={modul.module_code}
                 sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  gap: "18px",
                   backgroundColor: "#FFF",
-                  border: "1px solid #d1d5db",
+                  border: "1px solid #e4e4e7",
                   padding: "14px",
                   borderRadius: "10px",
-                  gridColumn:
-                    lastAndFirst && lgUp
-                      ? "span 2 / span 2"
-                      : "span 1 / span 1",
+                  position: "relative",
                   transition: "all 0.3s",
                   cursor: "pointer",
                   "&:hover": {
-                    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                    boxShadow: "0 5px 15px 0 rgba(0,0,0,.08)",
                   },
                 }}
               >
                 <Box
+                  component="div"
+                  className="card-body"
                   display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
+                  flexDirection="column"
                 >
-                  <Typography variant="body2" marginBottom="10px">
-                    {modul?.module_code}
-                  </Typography>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                  >
+                    <Typography variant="body2" marginBottom="10px">
+                      {modul?.module_code}
+                    </Typography>
 
-                  <Typography variant="body2" marginBottom="10px">
-                    {formattedDate}
+                    <Typography variant="body2" marginBottom="10px">
+                      {formattedDate}
+                    </Typography>
+                  </Box>
+
+                  {modul?.banner ? (
+                    <LazyLoadImage
+                      effect="blur"
+                      src={modul.banner}
+                      alt={modul.title}
+                      style={{
+                        width: "100%",
+                        aspectRatio: "7/2",
+                        objectFit: "cover",
+                        borderRadius: "10px",
+                        marginBottom: "10px",
+                      }}
+                    />
+                  ) : (
+                    <Box
+                      sx={{
+                        backgroundColor: "#f1f5f9",
+                        marginBottom: "10px",
+                        aspectRatio: "7/2",
+                      }}
+                    />
+                  )}
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: "8px",
+                      maxWidth: "fit-content",
+                    }}
+                  >
+                    <IconNote
+                      color="#4b5563"
+                      size={22}
+                      style={{
+                        marginRight: 6,
+                        alignSelf: "self-start",
+                        flexShrink: 0,
+                      }}
+                    />
+
+                    <Typography
+                      component="h5"
+                      className="line-clamp-1"
+                      variant="h5"
+                      sx={{
+                        color: "#1f2937",
+                        fontWeight: 600,
+                        letterSpacing: "-0.02em",
+                        "&:hover": {
+                          textDecoration: "underline",
+                        },
+                      }}
+                    >
+                      {modul.title}
+                    </Typography>
+                  </Box>
+
+                  <Typography
+                    variant="body1"
+                    sx={{ color: "#6b7280", fontSize: "16px" }}
+                  >
+                    {modul.description ?? "-"}
                   </Typography>
                 </Box>
 
                 <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "8px",
-                    maxWidth: "fit-content",
-                  }}
+                  component="div"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  gap="8px"
                 >
-                  <IconNote
-                    color="#4b5563"
-                    size={22}
-                    style={{
-                      marginRight: 6,
-                      alignSelf: "self-start",
-                      flexShrink: 0,
-                    }}
-                  />
+                  {mdUp && (
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 600,
+                        backgroundColor: "#fdba74",
+                        p: 1,
+                        borderRadius: 1,
+                      }}
+                    >
+                      {modul.users?.fullname ?? "-"}
+                    </Typography>
+                  )}
 
-                  <Typography
-                    component="h5"
-                    className="line-clamp-1"
-                    variant="h5"
-                    sx={{
-                      color: "#1f2937",
-                      fontWeight: 600,
-                      letterSpacing: "-0.02em",
-                      "&:hover": {
-                        textDecoration: "underline",
-                      },
-                    }}
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    sx={{ gap: "8px", flexWrap: lgUp ? "nowrap" : "wrap" }}
                   >
-                    {modul.title}
-                  </Typography>
-                </Box>
+                    <Button
+                      type="button"
+                      variant="text"
+                      size="small"
+                      color="inherit"
+                    >
+                      <Tooltip title="Pergi ke YouTube">
+                        <IconBrandYoutube />
+                      </Tooltip>
+                    </Button>
 
-                <Typography
-                  variant="body1"
-                  sx={{ color: "#6b7280", fontSize: "16px" }}
-                >
-                  {modul.description}
-                </Typography>
+                    <Button
+                      type="button"
+                      size="small"
+                      variant="text"
+                      color="inherit"
+                    >
+                      <Tooltip title="Lihat Detail Modul">
+                        <IconEyeSearch />
+                      </Tooltip>
+                    </Button>
+
+                    <Button
+                      type="button"
+                      size="small"
+                      variant="text"
+                      color="warning"
+                    >
+                      <Tooltip title="Ubah Modul">
+                        <IconPencil />
+                      </Tooltip>
+                    </Button>
+
+                    <Button
+                      type="button"
+                      size="small"
+                      variant="text"
+                      color="error"
+                    >
+                      <IconTrash />
+                    </Button>
+
+                    {!mdUp && (
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          backgroundColor: "#fdba74",
+                          p: 1,
+                          borderRadius: 1,
+                        }}
+                      >
+                        {modul.users?.fullname ?? "-"}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
               </Box>
             );
           })
