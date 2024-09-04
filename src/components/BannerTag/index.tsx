@@ -5,6 +5,7 @@ import {
   IconNotes,
   IconSend,
   IconSpeakerphone,
+  IconUser,
 } from "@tabler/icons-react";
 
 import ShinySingle from "components/Svg/ShinySingle";
@@ -12,7 +13,13 @@ import ShinySingle from "components/Svg/ShinySingle";
 type ActiveIconProps = Record<string, JSX.Element>;
 
 type BannerTagProps = {
-  type: "dashboard" | "module" | "announcement" | "event" | "discussion";
+  type:
+    | "dashboard"
+    | "module"
+    | "announcement"
+    | "event"
+    | "discussion"
+    | "pengguna";
 };
 
 const activeIcon: ActiveIconProps = {
@@ -21,6 +28,7 @@ const activeIcon: ActiveIconProps = {
   announcement: <IconNotes style={{ flexShrink: 0 }} />,
   event: <IconSpeakerphone style={{ flexShrink: 0 }} />,
   discussion: <IconSend style={{ flexShrink: 0 }} />,
+  pengguna: <IconUser style={{ flexShrink: 0 }} />,
 };
 
 const activeTitle: Record<string, string> = {
@@ -29,6 +37,7 @@ const activeTitle: Record<string, string> = {
   announcement: "Berita & Pengumuman",
   event: "Informasi Event",
   discussion: "Buka Diskusi",
+  pengguna: "Manajemen Pengguna",
 };
 
 const activeDescription: Record<string, string> = {
@@ -37,6 +46,7 @@ const activeDescription: Record<string, string> = {
   announcement: "Baca berita dan pengumuman terbaru",
   event: "Ikuti event yang sedang berlangsung",
   discussion: "Buka diskusi dan tanya jawab",
+  pengguna: "Informasi tentang pengguna",
 };
 
 const BannerTag = ({ type }: BannerTagProps): JSX.Element => {

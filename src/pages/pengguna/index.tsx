@@ -22,7 +22,7 @@ import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
 import { useMemo } from "react";
 
-const EventPage = (): JSX.Element => {
+const PenggunaPage = (): JSX.Element => {
   const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up("lg"));
   const { control } = useForm({
     defaultValues: {
@@ -49,7 +49,7 @@ const EventPage = (): JSX.Element => {
                     </InputAdornment>
                   ),
                 }}
-                placeholder="Cari data event..."
+                placeholder="Cari data pengguna..."
               />
             );
           }}
@@ -71,7 +71,7 @@ const EventPage = (): JSX.Element => {
             style={{ fontSize: 12 }}
           />
           <Column
-            header="NAMA EVENT"
+            header="NAMA LENGKAP"
             sortable
             field="fullname"
             alignHeader={"center"}
@@ -100,7 +100,7 @@ const EventPage = (): JSX.Element => {
       title="Event - Yayasan Pemberdayaan Perempuan Kepala Keluarga PEKKA"
       description="#"
     >
-      <BannerTag type="event" />
+      <BannerTag type="pengguna" />
 
       <DataTable
         alwaysShowPaginator
@@ -222,4 +222,4 @@ const EventPage = (): JSX.Element => {
   );
 };
 
-export default EventPage;
+export default PenggunaPage;

@@ -1,5 +1,5 @@
-import { Box } from "@mui/material";
 import BannerTag from "components/BannerTag";
+import DashboardContainer from "components/Container/DashboardContainer";
 import PageContainer from "components/Container/PageContainer";
 
 const Dashboard = (): JSX.Element => {
@@ -9,7 +9,7 @@ const Dashboard = (): JSX.Element => {
       description="#"
     >
       <BannerTag type="dashboard" />
-      <Box></Box>
+      <DashboardContainer />
     </PageContainer>
   );
 };

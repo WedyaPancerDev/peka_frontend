@@ -10,6 +10,7 @@ const Module = loadable(() => import("pages/modul"));
 const Dashboard = loadable(() => import("pages/dashboard"));
 const Discussion = loadable(() => import("pages/discussion"));
 const Announcement = loadable(() => import("pages/announcement"));
+const PenggunaPage = loadable(() => import("pages/pengguna"));
 
 import NotFound from "pages/404";
 
@@ -31,6 +32,7 @@ const routers = createBrowserRouter([
       { path: "/berita-dan-pengumuman", element: <Announcement /> },
       { path: "/modul-materi", element: <Module /> },
       { path: "/buka-diskusi", element: <Discussion /> },
+      { path: "/manajemen-pengguna", element: <PenggunaPage /> },
     ],
     errorElement: <NotFound />,
   },
