@@ -41,7 +41,7 @@ const AnnouncementPage = (): JSX.Element => {
           sx={{ fontWeight: 600, display: "inline-flex", alignItems: "center" }}
         >
           <IconPlus size={20} style={{ marginRight: "2px" }} />
-          <span>Tambah Data Berita dan Pengunguman</span>
+          <span>Tambah Data Berita dan Pengumuman</span>
         </Button>
         <Controller
           name="search"
