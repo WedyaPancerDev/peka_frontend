@@ -14,7 +14,7 @@ import { Column } from "primereact/column";
 import BannerTag from "components/BannerTag";
 import PageContainer from "components/Container/PageContainer";
 import { useForm, Controller } from "react-hook-form";
-import { IconSearch, IconUser } from "@tabler/icons-react";
+import { IconPlus, IconSearch, IconUser } from "@tabler/icons-react";
 
 import "primereact/resources/primereact.min.css";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
@@ -33,6 +33,16 @@ const EventPage = (): JSX.Element => {
   const renderHeader = (): JSX.Element => {
     return (
       <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Button
+          // LinkComponent={}
+          href="/"
+          variant="contained"
+          size="large"
+          sx={{ fontWeight: 600, display: "inline-flex", alignItems: "center" }}
+        >
+          <IconPlus size={20} style={{ marginRight: "2px" }} />
+          <span>Tambah Data Event</span>
+        </Button>
         <Controller
           name="search"
           control={control}
@@ -73,14 +83,35 @@ const EventPage = (): JSX.Element => {
           <Column
             header="NAMA EVENT"
             sortable
-            field="fullname"
+            field="title"
             alignHeader={"center"}
             style={{ fontSize: 12 }}
           />
           <Column
-            header="POSISI"
+            header="DESKRIPSI"
             sortable
-            field="position"
+            field="description"
+            alignHeader={"center"}
+            style={{ fontSize: 12 }}
+          />
+          <Column
+            header="LOKASI"
+            sortable
+            field="location"
+            alignHeader={"center"}
+            style={{ fontSize: 12 }}
+          />
+          <Column
+            header="ALAMAT"
+            sortable
+            field="address"
+            alignHeader={"center"}
+            style={{ fontSize: 12 }}
+          />
+          <Column
+            header="STATUS"
+            sortable
+            field="status"
             alignHeader={"center"}
             style={{ fontSize: 12 }}
           />
@@ -102,122 +133,202 @@ const EventPage = (): JSX.Element => {
     >
       <BannerTag type="event" />
 
-      <DataTable
-        alwaysShowPaginator
-        size="small"
-        groupRowsBy="id"
-        sortMode="single"
-        scrollable
-        value={[]}
-        scrollHeight="auto"
-        headerColumnGroup={HeaderGroup}
-        showGridlines
-        stripedRows
-        tableStyle={{ minWidth: "50rem" }}
-        paginator
-        rows={10}
-        header={header}
-        rowsPerPageOptions={[5, 10, 20, 30]}
-        style={{
-          boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.05)",
-          fontFamily: "Plus Jakarta Sans, sans-serif !important",
-          fontSize: 14,
-        }}
-      >
-        <Column
-          field="no"
-          header="NO"
-          bodyStyle={{
-            textAlign: "center",
-            padding: "8px 0",
-            width: "5%",
+      <Box marginTop="30px">
+        <DataTable
+          alwaysShowPaginator
+          size="small"
+          groupRowsBy="id"
+          sortMode="single"
+          scrollable
+          value={[]}
+          scrollHeight="auto"
+          headerColumnGroup={HeaderGroup}
+          showGridlines
+          stripedRows
+          tableStyle={{ minWidth: "50rem" }}
+          paginator
+          rows={10}
+          header={header}
+          rowsPerPageOptions={[5, 10, 20, 30]}
+          style={{
+            boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.05)",
+            fontFamily: "Plus Jakarta Sans, sans-serif !important",
+            fontSize: 14,
           }}
-          body={(_, { rowIndex }) => {
-            return (
-              <div className="table-content">
-                <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                  {rowIndex + 1}
-                </Typography>
-              </div>
-            );
-          }}
-        ></Column>
-        <Column
-          field="fullname"
-          header="FULLNAME"
-          bodyStyle={{
-            textAlign: "center",
-            padding: "8px 0",
-          }}
-          body={() => {
-            return (
-              <Box className="table-content">
-                <Typography
-                  variant="body1"
-                  sx={{
-                    fontWeight: 600,
-                    maxWidth: "160px",
-                    margin: "0 auto",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
-                  }}
-                ></Typography>
-              </Box>
-            );
-          }}
-        ></Column>
-        <Column
-          field="position"
-          header="POSISI"
-          bodyStyle={{
-            textAlign: "center",
-            padding: "8px 0",
-          }}
-          body={() => {
-            return (
-              <Box className="table-content">
-                <Typography
-                  variant="body1"
-                  sx={{
-                    fontWeight: 600,
-                    maxWidth: "160px",
-                    margin: "0 auto",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
-                    textTransform: "capitalize",
-                  }}
-                ></Typography>
-              </Box>
-            );
-          }}
-        ></Column>
-        <Column
-          field="action"
-          header="AKSI"
-          bodyStyle={{
-            textAlign: "center",
-            padding: "8px 0",
-          }}
-          body={() => {
-            return (
-              <Box display="flex" alignItems="center" px="10px" gap="10px">
-                <Button
-                  fullWidth
-                  type="button"
-                  color="inherit"
-                  sx={{ fontWeight: 700, fontSize: "14px" }}
-                  variant="contained"
-                >
-                  <IconUser size={16} style={{ marginRight: "4px" }} />
-                  Lihat Rekap
-                </Button>
-              </Box>
-            );
-          }}
-        ></Column>
-      </DataTable>
+        >
+          <Column
+            field="no"
+            header="NO"
+            bodyStyle={{
+              textAlign: "center",
+              padding: "8px 0",
+              width: "5%",
+            }}
+            body={(_, { rowIndex }) => {
+              return (
+                <div className="table-content">
+                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                    {rowIndex + 1}
+                  </Typography>
+                </div>
+              );
+            }}
+          ></Column>
+          <Column
+            field="title"
+            header="NAMA EVENT"
+            bodyStyle={{
+              textAlign: "center",
+              padding: "8px 0",
+            }}
+            body={() => {
+              return (
+                <Box className="table-content">
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: 600,
+                      maxWidth: "160px",
+                      margin: "0 auto",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                    }}
+                  ></Typography>
+                </Box>
+              );
+            }}
+          ></Column>
+          <Column
+            field="description"
+            header="DESKRIPSI"
+            bodyStyle={{
+              textAlign: "center",
+              padding: "8px 0",
+            }}
+            body={() => {
+              return (
+                <Box className="table-content">
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: 600,
+                      maxWidth: "160px",
+                      margin: "0 auto",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                      textTransform: "capitalize",
+                    }}
+                  ></Typography>
+                </Box>
+              );
+            }}
+          ></Column>
+          <Column
+            field="address"
+            header="ALAMAT"
+            bodyStyle={{
+              textAlign: "center",
+              padding: "8px 0",
+            }}
+            body={() => {
+              return (
+                <Box className="table-content">
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: 600,
+                      maxWidth: "160px",
+                      margin: "0 auto",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                      textTransform: "capitalize",
+                    }}
+                  ></Typography>
+                </Box>
+              );
+            }}
+          ></Column>
+          <Column
+            field="location"
+            header="LOKASI"
+            bodyStyle={{
+              textAlign: "center",
+              padding: "8px 0",
+            }}
+            body={() => {
+              return (
+                <Box className="table-content">
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: 600,
+                      maxWidth: "160px",
+                      margin: "0 auto",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                      textTransform: "capitalize",
+                    }}
+                  ></Typography>
+                </Box>
+              );
+            }}
+          ></Column>
+          <Column
+            field="status"
+            header="STATUS"
+            bodyStyle={{
+              textAlign: "center",
+              padding: "8px 0",
+            }}
+            body={() => {
+              return (
+                <Box className="table-content">
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: 600,
+                      maxWidth: "160px",
+                      margin: "0 auto",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                      textTransform: "capitalize",
+                    }}
+                  ></Typography>
+                </Box>
+              );
+            }}
+          ></Column>
+          <Column
+            field="action"
+            header="AKSI"
+            bodyStyle={{
+              textAlign: "center",
+              padding: "8px 0",
+            }}
+            body={() => {
+              return (
+                <Box display="flex" alignItems="center" px="10px" gap="10px">
+                  <Button
+                    fullWidth
+                    type="button"
+                    color="inherit"
+                    sx={{ fontWeight: 700, fontSize: "14px" }}
+                    variant="contained"
+                  >
+                    <IconUser size={16} style={{ marginRight: "4px" }} />
+                    Lihat Rekap
+                  </Button>
+                </Box>
+              );
+            }}
+          ></Column>
+        </DataTable>
+      </Box>
     </PageContainer>
   );
 };
