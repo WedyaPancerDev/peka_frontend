@@ -59,7 +59,7 @@ const AnnouncementPage = (): JSX.Element => {
                     </InputAdornment>
                   ),
                 }}
-                placeholder="Cari data pengguna..."
+                placeholder="Cari data Berita ..."
               />
             );
           }}
@@ -118,7 +118,7 @@ const AnnouncementPage = (): JSX.Element => {
       description="#"
     >
       <BannerTag type="announcement" />
-      <Box marginTop="30px">
+      <Box sx={{ marginY: "20px" }}>
         <DataTable
           alwaysShowPaginator
           size="small"

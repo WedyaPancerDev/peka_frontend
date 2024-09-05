@@ -133,7 +133,7 @@ const EventPage = (): JSX.Element => {
     >
       <BannerTag type="event" />
 
-      <Box marginTop="30px">
+      <Box sx={{ marginY: "20px" }}>
         <DataTable
           alwaysShowPaginator
           size="small"

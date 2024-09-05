@@ -126,7 +126,7 @@ const PenggunaPage = (): JSX.Element => {
     >
       <BannerTag type="pengguna" />
 
-      <Box marginTop="30px">
+      <Box sx={{ marginY: "20px" }}>
         <DataTable
           alwaysShowPaginator
           size="small"
