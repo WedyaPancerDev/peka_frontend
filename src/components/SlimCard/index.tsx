@@ -1,11 +1,27 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Skeleton, Typography } from "@mui/material";
+import { IconReportAnalytics } from "@tabler/icons-react";
+import { IconReport, IconUser } from "@tabler/icons-react";
 
 interface SlimCardProps {
   title: string;
+  value: number;
+  isLoading: boolean;
   style?: React.CSSProperties;
+  type: "pengguna" | "module" | "event";
 }
 
-const SlimCard = ({ title = "", style }: SlimCardProps): JSX.Element => {
+const SlimCard = ({
+  title = "",
+  value = 0,
+  style,
+  type = "pengguna",
+  isLoading = false,
+}: SlimCardProps): JSX.Element => {
+  const icon: Record<string, JSX.Element> = {
+    pengguna: <IconUser size={24} />,
+    module: <IconReport size={24} />,
+    event: <IconReportAnalytics size={24} />,
+  };
   return (
     <Box
       sx={{
@@ -30,6 +46,28 @@ const SlimCard = ({ title = "", style }: SlimCardProps): JSX.Element => {
         >
           {title}
         </Typography>
+
+        {icon[type]}
+      </Box>
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        {isLoading ? (
+          <Skeleton
+            width={44}
+            height={44}
+            variant="rounded"
+            sx={{ marginTop: "4px" }}
+          />
+        ) : (
+          <Typography
+            marginTop="4px"
+            variant="h1"
+            fontSize="38px"
+            fontWeight={800}
+            letterSpacing={-1}
+          >
+            {value}
+          </Typography>
+        )}
       </Box>
     </Box>
   );
