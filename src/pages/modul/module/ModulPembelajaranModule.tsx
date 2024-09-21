@@ -172,6 +172,8 @@ const ModulPembelajaranModule = () => {
 
                   <Typography
                     variant="body1"
+                    component="p"
+                    className="line-clamp-4"
                     sx={{ color: "#6b7280", fontSize: "16px" }}
                   >
                     {modul.description ?? "-"}

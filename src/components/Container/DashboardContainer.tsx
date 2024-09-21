@@ -1,8 +1,12 @@
 import { Box } from "@mui/material";
 
 import SlimCard from "components/SlimCard";
+import { useUserDashboard } from "hooks/react-query/useUsers";
 
 const DashboardContainer = (): JSX.Element => {
+  const { data: dashboardData, isLoading } = useUserDashboard();
+  const dashboard = dashboardData?.data;
+
   return (
     <Box
       sx={{
@@ -21,16 +25,30 @@ const DashboardContainer = (): JSX.Element => {
       <SlimCard
         type="pengguna"
         title="Jumlah Pengguna"
-        value={6}
-        isLoading={false}
+        value={dashboard?.users || 0}
+        isLoading={isLoading}
       />
+
       <SlimCard
         type="module"
-        title="Jumlah module"
-        value={3}
-        isLoading={false}
+        title="Jumlah Modul"
+        value={dashboard?.module || 0}
+        isLoading={isLoading}
       />
-      <SlimCard type="event" title="Jumlah event" value={2} isLoading={false} />
+
+      <SlimCard
+        type="event"
+        title="Jumlah Event"
+        value={dashboard?.events || 0}
+        isLoading={isLoading}
+      />
+
+      <SlimCard
+        type="news"
+        title="Jumlah Berita"
+        value={dashboard?.news || 0}
+        isLoading={isLoading}
+      />
     </Box>
   );
 };

@@ -1,6 +1,6 @@
 import useCookie from "hooks/useCookie";
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 type PublicRouteProps = {
   children: React.ReactNode;

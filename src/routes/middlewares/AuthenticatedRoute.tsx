@@ -1,13 +1,14 @@
+import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 import useCookie from "hooks/useCookie";
 import { AppState, useDispatch, useSelector } from "store/Store";
 import PageLoader from "components/PageLoader";
 import { useProfileUser } from "hooks/react-query/useAuth";
 import { setProfile } from "store/apps/DashboardSlice";
-import { AxiosError } from "axios";
 import toast from "react-hot-toast";
+import { setTokenBearer } from "utils/axios";
 
 type AuthenticatedRouteProps = {
   children: React.ReactNode;
@@ -31,12 +32,14 @@ const AuthenticatedRoute = ({
 
   const handleUnauthenticated = () => {
     removeFromCookie();
+    setTokenBearer("")
     navigate("/masuk", { replace: true });
     setIsAuthenticated(false);
   };
 
   const handleSessionExpired = () => {
     removeFromCookie();
+    setTokenBearer("")
     navigate("/masuk", { replace: true });
     toast.error("Sesi Anda telah berakhir, silahkan login kembali");
   };

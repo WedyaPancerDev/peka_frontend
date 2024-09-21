@@ -7,7 +7,7 @@ interface SlimCardProps {
   value: number;
   isLoading: boolean;
   style?: React.CSSProperties;
-  type: "pengguna" | "module" | "event";
+  type: "pengguna" | "module" | "event" | "news";
 }
 
 const SlimCard = ({
@@ -21,7 +21,9 @@ const SlimCard = ({
     pengguna: <IconUser size={24} />,
     module: <IconReport size={24} />,
     event: <IconReportAnalytics size={24} />,
+    news: <IconReport size={24} />,
   };
+
   return (
     <Box
       sx={{

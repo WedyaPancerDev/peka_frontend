@@ -1,123 +1,119 @@
+import { Avatar, AvatarGroup, Box, Button, Chip, Tooltip } from "@mui/material";
 import {
-  Box,
-  Button,
-  InputAdornment,
-  TextField,
-  Typography,
-  useMediaQuery,
-  type Theme,
-} from "@mui/material";
+  type ColGroupDef,
+  type ColDef,
+  type ValueFormatterParams,
+} from "ag-grid-community";
+import { useMemo, useState } from "react";
+import { PhotoProvider, PhotoView } from "react-photo-view";
 
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
+import "react-photo-view/dist/react-photo-view.css";
+
+import loadable from "@loadable/component";
 
 import BannerTag from "components/BannerTag";
 import PageContainer from "components/Container/PageContainer";
-import { useForm, Controller } from "react-hook-form";
-import { IconPlus, IconSearch, IconUser } from "@tabler/icons-react";
+import { UsersResponse } from "services/users";
+import { formatDate } from "utils/helpers";
+import FormDialog from "components/Dialog";
+import PageLoader from "components/PageLoader";
+import { useUsers } from "hooks/react-query/useUsers";
 
-import "primereact/resources/primereact.min.css";
-import "primereact/resources/themes/lara-light-indigo/theme.css";
-import { ColumnGroup } from "primereact/columngroup";
-import { Row } from "primereact/row";
-import { useMemo } from "react";
+const TableContainer = loadable(() => import("components/TableContainer"), {
+  fallback: <p>...</p>,
+});
 
 const PenggunaPage = (): JSX.Element => {
-  const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up("lg"));
-  const { control } = useForm({
-    defaultValues: {
-      search: "",
-    },
-  });
+  const { data: userData, isLoading: isLoadingEvents } = useUsers();
 
-  const renderHeader = (): JSX.Element => {
-    return (
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Button
-          // LinkComponent={}
-          href="/"
-          variant="contained"
-          size="large"
-          sx={{ fontWeight: 600, display: "inline-flex", alignItems: "center" }}
-        >
-          <IconPlus size={20} style={{ marginRight: "2px" }} />
-          <span>Tambah Data Pegawai</span>
-        </Button>
-        <Controller
-          name="search"
-          control={control}
-          render={({ field }) => {
-            return (
-              <TextField
-                {...field}
-                type="text"
-                sx={{ marginTop: lgUp ? 0 : 1 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <IconSearch size={20} />
-                    </InputAdornment>
-                  ),
-                }}
-                placeholder="Cari data pegawai..."
-              />
-            );
-          }}
-        />
-      </Box>
-    );
+  const [isShowImage, setIsShowImage] = useState<boolean>(false);
+  const [selectedRows, setSelectedRows] = useState<UsersResponse | null>(null);
+
+  const handleOpenImages = (payload: UsersResponse): void => {
+    setSelectedRows(payload);
+    setIsShowImage((prev) => !prev);
   };
 
-  const header = renderHeader();
+  const handleCloseImages = (): void => {
+    setSelectedRows(null);
+    setIsShowImage(false);
+  };
 
-  const HeaderGroup = useMemo(() => {
-    return (
-      <ColumnGroup>
-        <Row style={{ fontFamily: "Plus Jakarta Sans" }}>
-          <Column
-            header="NO"
-            field="no"
-            alignHeader={"center"}
-            style={{ fontSize: 12 }}
-          />
-          <Column
-            header="NAMA LENGKAP"
-            sortable
-            field="fullname"
-            alignHeader={"center"}
-            style={{ fontSize: 12 }}
-          />
-          <Column
-            header="EMAIL"
-            sortable
-            field="email"
-            alignHeader={"center"}
-            style={{ fontSize: 12 }}
-          />
-          <Column
-            header="NO HANDPHONE"
-            sortable
-            field="nohandphone"
-            alignHeader={"center"}
-            style={{ fontSize: 12 }}
-          />
-          <Column
-            header="POSISI"
-            sortable
-            field="position"
-            alignHeader={"center"}
-            style={{ fontSize: 12 }}
-          />
-          <Column
-            header="AKSI"
-            field="action"
-            alignHeader={"center"}
-            style={{ fontSize: 12, width: "30%" }}
-          />
-        </Row>
-      </ColumnGroup>
-    );
+  const columns: ColDef[] | ColGroupDef[] = useMemo(() => {
+    return [
+      {
+        headerName: "No",
+        width: 55,
+        valueFormatter: (params: ValueFormatterParams) => {
+          return `${Number(params.node?.id ?? 0) + 1}`;
+        },
+      },
+      {
+        headerName: "Nama Lengkap",
+        field: "fullname",
+        filter: "agTextColumnFilter",
+        floatingFilter: true,
+      },
+      {
+        headerName: "Email",
+        field: "email",
+        filter: "agTextColumnFilter",
+        floatingFilter: true,
+      },
+      {
+        headerName: "Nomor Telepon",
+        field: "phone",
+        filter: "agTextColumnFilter",
+        floatingFilter: true,
+      },
+      {
+        headerName: "Role",
+        field: "role",
+        filter: true,
+      },
+      {
+        headerName: "Tanggal Lahir",
+        field: "birth_of_date",
+        filter: true,
+      },
+      {
+        headerName: "Aksi",
+        field: "action",
+        cellRenderer: ({ data }: { data: any }) => {
+          return (
+            <Box display="flex" gap="0.5rem" marginTop="4px">
+              <Button
+                type="button"
+                variant="contained"
+                color="warning"
+                size="small"
+                sx={{ fontWeight: 500 }}
+              >
+                <span>Edit Pengguna</span>
+              </Button>
+            </Box>
+          );
+        },
+      },
+    ];
   }, []);
+
+  const rows = useMemo(() => {
+    if (userData?.data) {
+      return userData.data.map((user) => ({
+        fullname: user.fullname,
+        email: user.email || '-',
+        phone: user.phone,
+        role: user.role?.toUpperCase(),
+        birth_of_date: user?.birth_of_date
+          ? formatDate(user?.birth_of_date)
+          : "-",
+        avatar: user.avatar ?? "",
+      }));
+    }
+
+    return [];
+  }, [userData?.data]);
 
   return (
     <PageContainer
@@ -127,175 +123,49 @@ const PenggunaPage = (): JSX.Element => {
       <BannerTag type="pengguna" />
 
       <Box sx={{ marginY: "20px" }}>
-        <DataTable
-          alwaysShowPaginator
-          size="small"
-          groupRowsBy="id"
-          sortMode="single"
-          scrollable
-          value={[]}
-          scrollHeight="auto"
-          headerColumnGroup={HeaderGroup}
-          showGridlines
-          stripedRows
-          tableStyle={{ minWidth: "50rem" }}
-          paginator
-          rows={10}
-          header={header}
-          rowsPerPageOptions={[5, 10, 20, 30]}
-          style={{
-            boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.05)",
-            fontFamily: "Plus Jakarta Sans, sans-serif !important",
-            fontSize: 14,
+        {isLoadingEvents ? (
+          <PageLoader />
+        ) : (
+          <TableContainer
+            rows={rows || []}
+            columns={columns}
+            pagination={true}
+            paginationPageSize={10}
+            rowSelection="multiple"
+            suppressColumnVirtualisation={true}
+            suppressRowVirtualisation={true}
+            paginationPageSizeSelector={[10, 20, 30]}
+          />
+        )}
+      </Box>
+
+      {isShowImage && selectedRows && (
+        <FormDialog
+          open={isShowImage}
+          maxWidth="sm"
+          title="Gambar Banner Berita"
+          handleClose={() => {
+            handleCloseImages();
           }}
         >
-          <Column
-            field="no"
-            header="NO"
-            bodyStyle={{
-              textAlign: "center",
-              padding: "8px 0",
-              width: "5%",
-            }}
-            body={(_, { rowIndex }) => {
-              return (
-                <div className="table-content">
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    {rowIndex + 1}
-                  </Typography>
-                </div>
-              );
-            }}
-          ></Column>
-          <Column
-            field="fullname"
-            header="FULLNAME"
-            bodyStyle={{
-              textAlign: "center",
-              padding: "8px 0",
-            }}
-            body={() => {
-              return (
-                <Box className="table-content">
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontWeight: 600,
-                      maxWidth: "160px",
-                      margin: "0 auto",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                      textOverflow: "ellipsis",
-                    }}
-                  ></Typography>
-                </Box>
-              );
-            }}
-          ></Column>
-          <Column
-            field="email"
-            header="EMAIL"
-            bodyStyle={{
-              textAlign: "center",
-              padding: "8px 0",
-            }}
-            body={() => {
-              return (
-                <Box className="table-content">
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontWeight: 600,
-                      maxWidth: "160px",
-                      margin: "0 auto",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                      textOverflow: "ellipsis",
-                      textTransform: "capitalize",
-                    }}
-                  ></Typography>
-                </Box>
-              );
-            }}
-          ></Column>
-          <Column
-            field="nohandphone"
-            header="NO HANDPHONE"
-            bodyStyle={{
-              textAlign: "center",
-              padding: "8px 0",
-            }}
-            body={() => {
-              return (
-                <Box className="table-content">
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontWeight: 600,
-                      maxWidth: "160px",
-                      margin: "0 auto",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                      textOverflow: "ellipsis",
-                      textTransform: "capitalize",
-                    }}
-                  ></Typography>
-                </Box>
-              );
-            }}
-          ></Column>
-          <Column
-            field="position"
-            header="POSISI"
-            bodyStyle={{
-              textAlign: "center",
-              padding: "8px 0",
-            }}
-            body={() => {
-              return (
-                <Box className="table-content">
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontWeight: 600,
-                      maxWidth: "160px",
-                      margin: "0 auto",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                      textOverflow: "ellipsis",
-                      textTransform: "capitalize",
-                    }}
-                  ></Typography>
-                </Box>
-              );
-            }}
-          ></Column>
-          <Column
-            field="action"
-            header="AKSI"
-            bodyStyle={{
-              textAlign: "center",
-              padding: "8px 0",
-            }}
-            body={() => {
-              return (
-                <Box display="flex" alignItems="center" px="10px" gap="10px">
-                  <Button
-                    fullWidth
-                    type="button"
-                    color="inherit"
-                    sx={{ fontWeight: 700, fontSize: "14px" }}
-                    variant="contained"
-                  >
-                    <IconUser size={16} style={{ marginRight: "4px" }} />
-                    Lihat Rekap
-                  </Button>
-                </Box>
-              );
-            }}
-          ></Column>
-        </DataTable>
-      </Box>
+          <PhotoProvider>
+            <PhotoView src={selectedRows?.avatar ?? ""}>
+              <img
+                src={selectedRows?.avatar ?? ""}
+                alt={selectedRows?.fullname ?? ""}
+                loading="lazy"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  maxHeight: "300px",
+                  objectFit: "cover",
+                  cursor: "pointer",
+                }}
+              />
+            </PhotoView>
+          </PhotoProvider>
+        </FormDialog>
+      )}
     </PageContainer>
   );
 };

@@ -1,116 +1,231 @@
+import { Box, Button, Chip } from "@mui/material";
 import {
-  Box,
-  Button,
-  InputAdornment,
-  TextField,
-  Typography,
-  useMediaQuery,
-  type Theme,
-} from "@mui/material";
+  type ColGroupDef,
+  type ColDef,
+  type ValueFormatterParams,
+} from "ag-grid-community";
+import { useMemo, useState } from "react";
+import { PhotoProvider, PhotoView } from "react-photo-view";
 
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
+import "react-photo-view/dist/react-photo-view.css";
+
+import loadable from "@loadable/component";
 
 import BannerTag from "components/BannerTag";
 import PageContainer from "components/Container/PageContainer";
-import { useForm, Controller } from "react-hook-form";
-import { IconPlus, IconSearch } from "@tabler/icons-react";
+import { NewsResponse } from "services/news";
+import { useNews } from "hooks/react-query/useNews";
+import { formatDate } from "utils/helpers";
+import FormDialog from "components/Dialog";
+import PageLoader from "components/PageLoader";
 
-import "primereact/resources/primereact.min.css";
-import "primereact/resources/themes/lara-light-indigo/theme.css";
-import { ColumnGroup } from "primereact/columngroup";
-import { Row } from "primereact/row";
-import { useMemo } from "react";
+const TableContainer = loadable(() => import("components/TableContainer"), {
+  fallback: <p>...</p>,
+});
 
 const AnnouncementPage = (): JSX.Element => {
-  const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up("lg"));
-  const { control } = useForm({
-    defaultValues: {
-      search: "",
-    },
-  });
+  const { data: newsData, isLoading: isLoadingNews } = useNews();
 
-  const renderHeader = (): JSX.Element => {
-    return (
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Button
-          // LinkComponent={}
-          href="/"
-          variant="contained"
-          size="large"
-          sx={{ fontWeight: 600, display: "inline-flex", alignItems: "center" }}
-        >
-          <IconPlus size={20} style={{ marginRight: "2px" }} />
-          <span>Tambah Data Berita dan Pengumuman</span>
-        </Button>
-        <Controller
-          name="search"
-          control={control}
-          render={({ field }) => {
-            return (
-              <TextField
-                {...field}
-                type="text"
-                sx={{ marginTop: lgUp ? 0 : 1 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <IconSearch size={20} />
-                    </InputAdornment>
-                  ),
-                }}
-                placeholder="Cari data Berita ..."
-              />
-            );
-          }}
-        />
-      </Box>
-    );
+  const [isShowImage, setIsShowImage] = useState<boolean>(false);
+  const [selectedRows, setSelectedRows] = useState<NewsResponse | null>(null);
+
+  const handleOpenImages = (payload: NewsResponse): void => {
+    setSelectedRows(payload);
+    setIsShowImage((prev) => !prev);
   };
 
-  const header = renderHeader();
+  const handleCloseImages = (): void => {
+    setSelectedRows(null);
+    setIsShowImage(false);
+  };
 
-  const HeaderGroup = useMemo(() => {
-    return (
-      <ColumnGroup>
-        <Row style={{ fontFamily: "Plus Jakarta Sans" }}>
-          <Column
-            header="NO"
-            field="no"
-            alignHeader={"center"}
-            style={{ fontSize: 12 }}
-          />
-          <Column
-            header="NAMA BERITA"
-            sortable
-            field="title"
-            alignHeader={"center"}
-            style={{ fontSize: 12 }}
-          />
-          <Column
-            header="DESKRIPSI"
-            sortable
-            field="description"
-            alignHeader={"center"}
-            style={{ fontSize: 12 }}
-          />
-          <Column
-            header="STATUS"
-            sortable
-            field="status"
-            alignHeader={"center"}
-            style={{ fontSize: 12 }}
-          />
-          <Column
-            header="AKSI"
-            field="action"
-            alignHeader={"center"}
-            style={{ fontSize: 12, width: "30%" }}
-          />
-        </Row>
-      </ColumnGroup>
-    );
+  const columns: ColDef[] | ColGroupDef[] = useMemo(() => {
+    return [
+      {
+        headerName: "No",
+        width: 55,
+        valueFormatter: (params: ValueFormatterParams) => {
+          return `${Number(params.node?.id ?? 0) + 1}`;
+        },
+      },
+      {
+        headerName: "Judul",
+        field: "title",
+        filter: "agTextColumnFilter",
+        floatingFilter: true,
+      },
+      {
+        headerName: "Deskripsi",
+        field: "description",
+        width: 180,
+        filter: true,
+      },
+      {
+        headerName: "Banner",
+        field: "banner",
+        filter: true,
+        cellRenderer: ({ data }: { data: NewsResponse }) => {
+          return (
+            <>
+              {data.banner ? (
+                <Button
+                  type="button"
+                  variant="text"
+                  color="primary"
+                  size="small"
+                  onClick={() => {
+                    handleOpenImages(data);
+                  }}
+                  sx={{ marginBottom: "4px", fontWeight: 600 }}
+                >
+                  Lihat Gambar
+                </Button>
+              ) : (
+                "-"
+              )}
+            </>
+          );
+        },
+      },
+      {
+        headerName: "Hastag",
+        field: "hastag",
+        filter: true,
+        width: 300,
+        cellRenderer: ({ data }: { data: NewsResponse }) => {
+          return (
+            <Box flexWrap="wrap">
+              {data.hastag.map((hastag, index) => (
+                <Chip
+                  key={index}
+                  label={hastag}
+                  size="small"
+                  color="success"
+                  variant="filled"
+                  sx={{
+                    textTransform: "uppercase",
+                    fontWeight: 700,
+                    fontSize: "0.75rem",
+                    marginRight: "4px",
+                  }}
+                />
+              ))}
+            </Box>
+          );
+        },
+      },
+      {
+        headerName: "Tanggal Publish",
+        field: "published_at",
+        filter: true,
+      },
+      {
+        headerName: "Referensi",
+        field: "url_news",
+        filter: true,
+        cellRenderer: ({ data }: { data: NewsResponse }) => {
+          return (
+            <>
+              <a
+                href={data.url_news}
+                target="_blank"
+                rel="noreferrer noopenner"
+              >
+                Lihat Berita
+              </a>
+            </>
+          );
+        },
+      },
+      {
+        headerName: "Penulis",
+        field: "users_author",
+        filter: "agTextColumnFilter",
+        floatingFilter: true,
+      },
+      {
+        headerName: "Editor",
+        field: "users_editor",
+        filter: "agTextColumnFilter",
+        floatingFilter: true,
+      },
+      {
+        headerName: "Status",
+        field: "status",
+        width: 150,
+        filter: true,
+        cellRenderer: ({ data }: { data: NewsResponse }) => {
+          const customChip: Record<string, JSX.Element> = {
+            published: (
+              <Chip
+                label={data.status}
+                size="small"
+                color="success"
+                variant="filled"
+                sx={{ textTransform: "uppercase" }}
+              />
+            ),
+            draft: (
+              <Chip
+                label={data.status}
+                size="small"
+                color="primary"
+                variant="filled"
+                sx={{ textTransform: "uppercase" }}
+              />
+            ),
+            inactive: (
+              <Chip
+                label={data.status}
+                size="small"
+                color="error"
+                variant="filled"
+                sx={{ textTransform: "uppercase" }}
+              />
+            ),
+          };
+          return <>{customChip[data.status]}</>;
+        },
+      },
+      {
+        headerName: "Aksi",
+        field: "action",
+        cellRenderer: ({ data }: { data: any }) => {
+          return (
+            <Box display="flex" gap="0.5rem" marginTop="4px">
+              <Button
+                type="button"
+                variant="contained"
+                color="warning"
+                size="small"
+                sx={{ fontWeight: 500 }}
+              >
+                <span>Edit Berita</span>
+              </Button>
+            </Box>
+          );
+        },
+      },
+    ];
   }, []);
+
+  const rows = useMemo(() => {
+    if (newsData?.data) {
+      return newsData.data.map((news) => ({
+        title: news.title,
+        description: news.description,
+        banner: news.banner,
+        hastag: news.hastag,
+        published_at: formatDate(news.published_at),
+        url_news: news.url_news,
+        users_author: news.users_author.fullname,
+        users_editor: news.users_editor.fullname,
+        status: news.status,
+      }));
+    }
+
+    return [];
+  }, [newsData?.data]);
 
   return (
     <PageContainer
@@ -119,165 +234,49 @@ const AnnouncementPage = (): JSX.Element => {
     >
       <BannerTag type="announcement" />
       <Box sx={{ marginY: "20px" }}>
-        <DataTable
-          alwaysShowPaginator
-          size="small"
-          groupRowsBy="id"
-          sortMode="single"
-          scrollable
-          value={[]}
-          scrollHeight="auto"
-          headerColumnGroup={HeaderGroup}
-          showGridlines
-          stripedRows
-          tableStyle={{ minWidth: "50rem" }}
-          paginator
-          rows={10}
-          header={header}
-          rowsPerPageOptions={[5, 10, 20, 30]}
-          style={{
-            boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.05)",
-            fontFamily: "Plus Jakarta Sans, sans-serif !important",
-            fontSize: 14,
+        {isLoadingNews ? (
+          <PageLoader />
+        ) : (
+          <TableContainer
+            rows={rows || []}
+            columns={columns}
+            pagination={true}
+            paginationPageSize={10}
+            rowSelection="multiple"
+            suppressColumnVirtualisation={true}
+            suppressRowVirtualisation={true}
+            paginationPageSizeSelector={[10, 20, 30]}
+          />
+        )}
+      </Box>
+
+      {isShowImage && selectedRows && (
+        <FormDialog
+          open={isShowImage}
+          maxWidth="sm"
+          title="Gambar Banner Berita"
+          handleClose={() => {
+            handleCloseImages();
           }}
         >
-          <Column
-            field="no"
-            header="NO"
-            bodyStyle={{
-              textAlign: "center",
-              padding: "8px 0",
-              width: "5%",
-            }}
-            body={(_, { rowIndex }) => {
-              return (
-                <div className="table-content">
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    {rowIndex + 1}
-                  </Typography>
-                </div>
-              );
-            }}
-          ></Column>
-          <Column
-            field="title"
-            header="NAMA BERITA"
-            bodyStyle={{
-              textAlign: "center",
-              padding: "8px 0",
-            }}
-            body={() => {
-              return (
-                <Box className="table-content">
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontWeight: 600,
-                      maxWidth: "160px",
-                      margin: "0 auto",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                      textOverflow: "ellipsis",
-                    }}
-                  ></Typography>
-                </Box>
-              );
-            }}
-          ></Column>
-          <Column
-            field="description"
-            header="DESKRIPSI"
-            bodyStyle={{
-              textAlign: "center",
-              padding: "8px 0",
-            }}
-            body={() => {
-              return (
-                <Box className="table-content">
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontWeight: 600,
-                      maxWidth: "160px",
-                      margin: "0 auto",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                      textOverflow: "ellipsis",
-                      textTransform: "capitalize",
-                    }}
-                  ></Typography>
-                </Box>
-              );
-            }}
-          ></Column>
-          <Column
-            field="status"
-            header="STATUS"
-            bodyStyle={{
-              textAlign: "center",
-              padding: "8px 0",
-            }}
-            body={() => {
-              return (
-                <Box className="table-content">
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontWeight: 600,
-                      maxWidth: "160px",
-                      margin: "0 auto",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                      textOverflow: "ellipsis",
-                      textTransform: "capitalize",
-                    }}
-                  ></Typography>
-                </Box>
-              );
-            }}
-          ></Column>
-          <Column
-            field="action"
-            header="AKSI"
-            bodyStyle={{
-              textAlign: "center",
-              padding: "8px 0",
-            }}
-            body={() => {
-              return (
-                <Box display="flex" alignItems="center" px="10px" gap="10px">
-                  <Button
-                    fullWidth
-                    size="small"
-                    type="button"
-                    color="warning"
-                    // onClick={() => {
-                    //   router.push(`/manajemen-pegawai/edit/${rowData.uuid}`);
-                    // }}
-                    variant="contained"
-                    sx={{ fontWeight: 700, fontSize: "12px" }}
-                  >
-                    Ubah
-                  </Button>
-                  <Button
-                    fullWidth
-                    size="small"
-                    type="button"
-                    color="error"
-                    sx={{ fontWeight: 700, fontSize: "12px" }}
-                    variant="contained"
-                    // onClick={() => {
-                    //   handleOpenDeletePopup(rowData.uuid);
-                    // }}
-                  >
-                    Non-Aktifkan
-                  </Button>
-                </Box>
-              );
-            }}
-          ></Column>
-        </DataTable>
-      </Box>
+          <PhotoProvider>
+            <PhotoView src={selectedRows?.banner ?? ""}>
+              <img
+                src={selectedRows?.banner ?? ""}
+                alt={selectedRows?.title}
+                loading="lazy"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  maxHeight: "300px",
+                  objectFit: "cover",
+                  cursor: "pointer",
+                }}
+              />
+            </PhotoView>
+          </PhotoProvider>
+        </FormDialog>
+      )}
     </PageContainer>
   );
 };
