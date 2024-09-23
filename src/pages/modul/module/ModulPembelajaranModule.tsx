@@ -59,8 +59,7 @@ const ModulPembelajaranModule = () => {
         sx={{
           gap: "12px",
           display: "grid",
-          gridTemplateColumns:
-            mdUp && dataModules?.data ? "repeat(2, 1fr)" : "repeat(1, 1fr)",
+          gridTemplateColumns: mdUp ? "repeat(2, 1fr)" : "repeat(1, 1fr)",
           marginTop: "20px",
         }}
       >

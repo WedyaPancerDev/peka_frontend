@@ -6,6 +6,10 @@ export const getEnv = (): "prod" | "dev" => {
   return env;
 };
 
+export const remove62Number = (phoneNumber: string): string => {
+  return phoneNumber.replace(/^62/, "0");
+};
+
 export const formatDate = (date: Date | string): string => {
   return new Date(date).toLocaleDateString("id-ID", {
     weekday: "long",

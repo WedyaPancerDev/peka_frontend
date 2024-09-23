@@ -14,7 +14,7 @@ import loadable from "@loadable/component";
 import BannerTag from "components/BannerTag";
 import PageContainer from "components/Container/PageContainer";
 import { UsersResponse } from "services/users";
-import { formatDate } from "utils/helpers";
+import { formatDate, remove62Number } from "utils/helpers";
 import FormDialog from "components/Dialog";
 import PageLoader from "components/PageLoader";
 import { useUsers } from "hooks/react-query/useUsers";
@@ -102,8 +102,8 @@ const PenggunaPage = (): JSX.Element => {
     if (userData?.data) {
       return userData.data.map((user) => ({
         fullname: user.fullname,
-        email: user.email || '-',
-        phone: user.phone,
+        email: user.email || "-",
+        phone: user?.phone ? remove62Number(user?.phone) : "-",
         role: user.role?.toUpperCase(),
         birth_of_date: user?.birth_of_date
           ? formatDate(user?.birth_of_date)
