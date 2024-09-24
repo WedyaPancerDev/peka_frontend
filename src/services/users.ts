@@ -33,3 +33,12 @@ export const getUserDashboard = async (): Promise<
 
   return result.data as ApiResponse<UserDashboardResponse>;
 };
+
+export const getUserById = async (
+  userId: string
+): Promise<ApiResponse<UsersResponse>> => {
+  const result = await axios.get(`/user/active/${userId}`);
+
+  return result.data as ApiResponse<UsersResponse>;
+};
+

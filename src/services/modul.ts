@@ -33,7 +33,7 @@ export const getModuleById = async (
 export type ModulePayload = {
   title: string;
   description: string;
-  banner: string;
+  banner: string | null;
   embed_video: string;
   created_by: string;
 };

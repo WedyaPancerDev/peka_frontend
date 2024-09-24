@@ -1,43 +1,28 @@
-import { Avatar, AvatarGroup, Box, Button, Chip, Tooltip } from "@mui/material";
+import { Avatar, Box, Button } from "@mui/material";
 import {
   type ColGroupDef,
   type ColDef,
   type ValueFormatterParams,
 } from "ag-grid-community";
-import { useMemo, useState } from "react";
-import { PhotoProvider, PhotoView } from "react-photo-view";
-
-import "react-photo-view/dist/react-photo-view.css";
+import { useMemo } from "react";
 
 import loadable from "@loadable/component";
 
 import BannerTag from "components/BannerTag";
 import PageContainer from "components/Container/PageContainer";
-import { UsersResponse } from "services/users";
 import { formatDate, remove62Number } from "utils/helpers";
-import FormDialog from "components/Dialog";
 import PageLoader from "components/PageLoader";
 import { useUsers } from "hooks/react-query/useUsers";
+import { useNavigate } from "react-router-dom";
+import { UsersResponse } from "services/users";
 
 const TableContainer = loadable(() => import("components/TableContainer"), {
   fallback: <p>...</p>,
 });
 
 const PenggunaPage = (): JSX.Element => {
+  const navigate = useNavigate();
   const { data: userData, isLoading: isLoadingEvents } = useUsers();
-
-  const [isShowImage, setIsShowImage] = useState<boolean>(false);
-  const [selectedRows, setSelectedRows] = useState<UsersResponse | null>(null);
-
-  const handleOpenImages = (payload: UsersResponse): void => {
-    setSelectedRows(payload);
-    setIsShowImage((prev) => !prev);
-  };
-
-  const handleCloseImages = (): void => {
-    setSelectedRows(null);
-    setIsShowImage(false);
-  };
 
   const columns: ColDef[] | ColGroupDef[] = useMemo(() => {
     return [
@@ -61,6 +46,22 @@ const PenggunaPage = (): JSX.Element => {
         floatingFilter: true,
       },
       {
+        headerName: "Profil",
+        field: "avatar",
+        width: 100,
+        cellRenderer: ({ data }: { data: UsersResponse }) => {
+          return (
+            <Box display="flex" justifyContent="center">
+              {data.avatar ? (
+                <Avatar src={data.avatar} alt={data.fullname} />
+              ) : (
+                "-"
+              )}
+            </Box>
+          );
+        },
+      },
+      {
         headerName: "Nomor Telepon",
         field: "phone",
         filter: "agTextColumnFilter",
@@ -79,7 +80,8 @@ const PenggunaPage = (): JSX.Element => {
       {
         headerName: "Aksi",
         field: "action",
-        cellRenderer: ({ data }: { data: any }) => {
+        cellRenderer: ({ data }: { data: UsersResponse }) => {
+          console.log({ data })
           return (
             <Box display="flex" gap="0.5rem" marginTop="4px">
               <Button
@@ -88,6 +90,9 @@ const PenggunaPage = (): JSX.Element => {
                 color="warning"
                 size="small"
                 sx={{ fontWeight: 500 }}
+                onClick={() => {
+                  navigate(`/manajemen-pengguna/${data.id}/edit`);
+                }}
               >
                 <span>Edit Pengguna</span>
               </Button>
@@ -101,6 +106,7 @@ const PenggunaPage = (): JSX.Element => {
   const rows = useMemo(() => {
     if (userData?.data) {
       return userData.data.map((user) => ({
+        id: user.id,
         fullname: user.fullname,
         email: user.email || "-",
         phone: user?.phone ? remove62Number(user?.phone) : "-",
@@ -117,11 +123,23 @@ const PenggunaPage = (): JSX.Element => {
 
   return (
     <PageContainer
-      title="Event - Yayasan Pemberdayaan Perempuan Kepala Keluarga PEKKA"
+      title="Pengguna - Yayasan Pemberdayaan Perempuan Kepala Keluarga PEKKA"
       description="#"
     >
       <BannerTag type="pengguna" />
 
+      <Box component="div" className="right-content" sx={{ marginTop: "20px" }}>
+        <Button
+          type="button"
+          onClick={() => {
+            navigate("/manajemen-pengguna/create");
+          }}
+          variant="contained"
+          color="primary"
+        >
+          Tambah Pengguna
+        </Button>
+      </Box>
       <Box sx={{ marginY: "20px" }}>
         {isLoadingEvents ? (
           <PageLoader />
@@ -138,34 +156,6 @@ const PenggunaPage = (): JSX.Element => {
           />
         )}
       </Box>
-
-      {isShowImage && selectedRows && (
-        <FormDialog
-          open={isShowImage}
-          maxWidth="sm"
-          title="Gambar Banner Berita"
-          handleClose={() => {
-            handleCloseImages();
-          }}
-        >
-          <PhotoProvider>
-            <PhotoView src={selectedRows?.avatar ?? ""}>
-              <img
-                src={selectedRows?.avatar ?? ""}
-                alt={selectedRows?.fullname ?? ""}
-                loading="lazy"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  maxHeight: "300px",
-                  objectFit: "cover",
-                  cursor: "pointer",
-                }}
-              />
-            </PhotoView>
-          </PhotoProvider>
-        </FormDialog>
-      )}
     </PageContainer>
   );
 };

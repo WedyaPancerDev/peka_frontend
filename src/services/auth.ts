@@ -25,11 +25,8 @@ export const authLogin = async (
 };
 
 export type RegisterPayload = {
-  email: string;
   password: string;
   fullname: string;
-  gender: "male" | "female";
-  avatar: string | null;
   phone: string;
 };
 
@@ -37,7 +34,7 @@ export const authRegister = async (
   payload: RegisterPayload,
   only?: Role
 ): Promise<ApiResponse<null>> => {
-  const roleList: Role[] = ["user", "admin_organization", "super_admin"];
+  const roleList: Role[] = ["admin_organization", "super_admin"];
   const url = roleList.includes(only as Role)
     ? `/auth/register?only=${only}`
     : "/auth/register";
@@ -61,17 +58,30 @@ export const authChangePassword = async (
 };
 
 export type UpdateProfilePayload = {
-  avatar: string;
   email: string;
   fullname: string;
-  gender: string;
   phone: string;
+  password?: string;
+  birth_of_date?: string;
 };
 
 export const authUpdateProfile = async (
   payload: UpdateProfilePayload
 ): Promise<ApiResponse<null>> => {
   const result = await axios.put("/user/update-profile", payload);
+
+  return result.data;
+};
+
+export interface UpdateUserByIdPayload extends UpdateProfilePayload {
+  role: Role;
+}
+
+export const authUserById = async (
+  userId: string,
+  payload: UpdateUserByIdPayload
+): Promise<ApiResponse<null>> => {
+  const result = await axios.put(`/user/update/${userId}`, payload);
 
   return result.data;
 };

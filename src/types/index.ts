@@ -3,4 +3,9 @@ export type BaseSVGProps = {
   color?: string;
 };
 
-export type Role = "user" | "admin_organization" | "super_admin";
+export type ReactSelectOption = {
+  value: string;
+  label: string;
+};
+
+export type Role = "user" | "admin_organization" | "super_admin" | string;

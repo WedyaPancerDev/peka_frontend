@@ -6,11 +6,16 @@ const BlankLayout = loadable(() => import("layouts/blank/BlankLayout"));
 
 const Login = loadable(() => import("pages/auth/Login"));
 const Event = loadable(() => import("pages/event"));
-const Module = loadable(() => import("pages/modul"));
 const Dashboard = loadable(() => import("pages/dashboard"));
 const Discussion = loadable(() => import("pages/discussion"));
 const Announcement = loadable(() => import("pages/announcement"));
+
+const Module = loadable(() => import("pages/modul"));
+const ModuleCreate = loadable(() => import("pages/modul/create"));
+
 const PenggunaPage = loadable(() => import("pages/pengguna"));
+const PenggunaTambahPage = loadable(() => import("pages/pengguna/create"));
+const PenggunaEditPage = loadable(() => import("pages/pengguna/edit"));
 
 import NotFound from "pages/404";
 
@@ -30,9 +35,18 @@ const routers = createBrowserRouter([
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/informasi-event", element: <Event /> },
       { path: "/berita-dan-pengumuman", element: <Announcement /> },
+
       { path: "/modul-materi", element: <Module /> },
+      { path: "/modul-materi/create", element: <ModuleCreate /> },
+
       { path: "/buka-diskusi", element: <Discussion /> },
+
       { path: "/manajemen-pengguna", element: <PenggunaPage /> },
+      { path: "/manajemen-pengguna/create", element: <PenggunaTambahPage /> },
+      {
+        path: "/manajemen-pengguna/:user_id/edit",
+        element: <PenggunaEditPage />,
+      },
     ],
     errorElement: <NotFound />,
   },

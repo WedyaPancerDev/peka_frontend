@@ -21,8 +21,11 @@ import SkeletonLoader from "components/Loader/SkeletonLoader";
 import { useAllModule } from "hooks/react-query/useModule";
 
 import "./index.css";
+import { useNavigate } from "react-router-dom";
 
 const ModulPembelajaranModule = () => {
+  const navigate = useNavigate();
+
   const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up("lg"));
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up("md"));
 
@@ -49,7 +52,12 @@ const ModulPembelajaranModule = () => {
         }}
       >
         <Box component="div" className="right-content">
-          <Button type="button" variant="contained" color="primary">
+          <Button
+            type="button"
+            onClick={() => navigate("/modul-materi/create")}
+            variant="contained"
+            color="primary"
+          >
             Tambah Modul Pembelajaran
           </Button>
         </Box>
@@ -268,10 +276,8 @@ const ModulPembelajaranModule = () => {
         ) : (
           <Box
             sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
               width: "100%",
+              display: "grid",
             }}
           >
             <Typography

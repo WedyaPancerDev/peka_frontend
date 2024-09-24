@@ -32,14 +32,14 @@ const AuthenticatedRoute = ({
 
   const handleUnauthenticated = () => {
     removeFromCookie();
-    setTokenBearer("")
+    setTokenBearer("");
     navigate("/masuk", { replace: true });
     setIsAuthenticated(false);
   };
 
   const handleSessionExpired = () => {
     removeFromCookie();
-    setTokenBearer("")
+    setTokenBearer("");
     navigate("/masuk", { replace: true });
     toast.error("Sesi Anda telah berakhir, silahkan login kembali");
   };
@@ -56,7 +56,11 @@ const AuthenticatedRoute = ({
   }, [token, profile, profileUserData, dispatch]);
 
   useEffect(() => {
-    if (error && (error as AxiosError)?.response?.status === 401) {
+    if (
+      error &&
+      ((error as AxiosError)?.response?.status === 401 ||
+        (error as AxiosError)?.response?.status === 403)
+    ) {
       handleSessionExpired();
     }
   }, [error]);
